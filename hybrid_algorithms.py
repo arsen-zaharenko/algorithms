@@ -30,8 +30,33 @@
 from random import randint
 from time import time
 
-def quick_sort(array: list):
-	pass
+
+
+# QUICK SORT
+
+def partition(array: list, left: int, right: int) -> int:
+	i = left - 1
+	pivot = array[right]
+
+	for j in range(left, right):
+		if array[j] <= pivot:
+			i += 1
+			array[i], array[j] = array[j], array[i]
+	array[i + 1], array[right] = array[right], array[i + 1]
+
+	return i + 1
+
+def quick_sort(array: list, left: int, right: int):
+	if len(array) == 1:
+		return	
+	if left < right:
+		p = partition(array, left, right)
+		quick_sort(array, left, p - 1)
+		quick_sort(array, p + 1, right)
+
+
+
+# INSERTION SORT
 
 def insertion_sort(array: list):
 	for i in range(1, len(array)):
@@ -42,6 +67,10 @@ def insertion_sort(array: list):
 			array[j + 1] = array[j]
 			j -= 1
 		array[j + 1] = key
+
+
+
+# MERGE SORT
 
 def merge_sort(array: list):
 	if len(array) > 1:
@@ -74,6 +103,26 @@ def merge_sort(array: list):
 			j += 1
 			k += 1
 
+
+
+# HYBRID QUICK-INSERTION SORT
+
+def hybrid_quick_sort(array: list, left: int, right: int, k: int):
+	if len(array) == 1:
+		return	
+	if right - left + 1 < k:
+		temp = array[left:right + 1]
+		insertion_sort(temp)
+		array = array[:left] + temp + array[right + 2:]
+	elif left < right:
+		p = partition(array, left, right)
+		hybrid_quick_sort(array, left, p - 1, k)
+		hybrid_quick_sort(array, p + 1, right, k)
+
+
+
+# HYBRID MERGE-INSERTION SORT
+
 def hybrid_merge_sort(array: list, k: int):
 	if len(array) > 1:
 		mid = len(array) // 2
@@ -105,13 +154,25 @@ def hybrid_merge_sort(array: list, k: int):
 			j += 1
 			k += 1
 
-def task_1(R: int, N: int, M: int):
+
+
+# TASK 1.1
+
+def task_1_1(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
 	
 	for array in arrays:
-		hybrid_quick_sort(array, k)
+		print(f'Origin: {array}')
+		start_time = time()
+		hybrid_quick_sort(array, left = 0, right = len(array) - 1, k = 5)
+		print(f'Sorted: {array}')
+		print(f'Time: {time() - start_time}', end = '\n\n')
 
-def task_2(R: int, N: int, M: int):
+
+
+# TASK 1.2
+
+def task_1_2(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
 	
 	for array in arrays:
@@ -126,4 +187,5 @@ def task_2(R: int, N: int, M: int):
 # Требуется отсортировать R массивов длины N со значениями из отрезка [0, M]. 
 
 if __name__ == '__main__':
-	task_2(R = 5, N = 20, M = 50)
+	task_1_1(R = 5, N = 20, M = 50)
+	task_1_2(R = 5, N = 20, M = 50)
