@@ -113,7 +113,8 @@ def hybrid_quick_sort(array: list, left: int, right: int, k: int):
 	if right - left + 1 < k:
 		temp = array[left:right + 1]
 		insertion_sort(temp)
-		array = array[:left] + temp + array[right + 2:]
+		for i in range(left, right + 1):
+			array[i] = temp[i - left]
 	elif left < right:
 		p = partition(array, left, right)
 		hybrid_quick_sort(array, left, p - 1, k)
