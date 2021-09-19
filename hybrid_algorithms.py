@@ -157,7 +157,7 @@ def hybrid_merge_sort(array: list, k: int):
 
 
 
-# TASK 1.1
+# TASK 1.1 (сортировка оптимальна при k = N / 20)
 
 def task_1_1(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
@@ -171,7 +171,7 @@ def task_1_1(R: int, N: int, M: int):
 
 
 
-# TASK 1.2
+# TASK 1.2 (сортировка оптимальна при k = N / 16)
 
 def task_1_2(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
