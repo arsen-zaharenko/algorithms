@@ -157,7 +157,7 @@ def hybrid_merge_sort(array: list, k: int):
 
 
 
-# TASK 1.1 (сортировка оптимальна при k = N / 20)
+# TASK 1.1 (сортировка оптимальна при k из отрезка [7, 49])
 
 def task_1_1(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
@@ -165,13 +165,13 @@ def task_1_1(R: int, N: int, M: int):
 	for array in arrays:
 		print(f'Origin: {array}')
 		start_time = time()
-		hybrid_quick_sort(array, left = 0, right = len(array) - 1, k = 5)
+		hybrid_quick_sort(array, left = 0, right = len(array) - 1, k = randint(7, 49))
 		print(f'Sorted: {array}')
 		print(f'Time: {time() - start_time}', end = '\n\n')
 
 
 
-# TASK 1.2 (сортировка оптимальна при k = N / 16)
+# TASK 1.2 (сортировка оптимальна при k из отрезка [2, 125])
 
 def task_1_2(R: int, N: int, M: int):
 	arrays = [[randint(0, M) for i in range(N)] for j in range(R)]
@@ -179,7 +179,7 @@ def task_1_2(R: int, N: int, M: int):
 	for array in arrays:
 		print(f'Origin: {array}')
 		start_time = time()
-		hybrid_merge_sort(array, k = 3)
+		hybrid_merge_sort(array, k = randint(2, 125))
 		print(f'Sorted: {array}')
 		print(f'Time: {time() - start_time}', end = '\n\n')
 
@@ -188,5 +188,5 @@ def task_1_2(R: int, N: int, M: int):
 # Требуется отсортировать R массивов длины N со значениями из отрезка [0, M]. 
 
 if __name__ == '__main__':
-	task_1_1(R = 5, N = 20, M = 50)
-	task_1_2(R = 5, N = 20, M = 50)
+	task_1_1(R = 5, N = 1000, M = 5000)
+	task_1_2(R = 5, N = 1000, M = 5000)
