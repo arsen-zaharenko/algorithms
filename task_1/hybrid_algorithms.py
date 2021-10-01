@@ -8,6 +8,7 @@
 Подобрать оптимальное k для сортировки R массивов длины N,
 элементы которых - случайные целые числа в диапазоне от 0 до M.
 Дать возможность пользователю задавать параметры R,N и M.
+
 Задание 1.2. 
 Реализовать один из гибридных алгоритмов, 
 сочетающий сортировку слиянием и сортировку вставками следующим образом: в алгоритме сортировки слиянием,
@@ -17,6 +18,7 @@
 Подобрать оптимальное k для сортировки R массивов длины N,
 элементы которых - случайные целые числа в диапазоне от 0 до M.
 Дать возможность пользователю задавать параметры R,N и M.
+
 Задание 1.3. 
 Подсчитать число элементарных операций в вашей реализации сортировки вставками.
 '''
@@ -261,7 +263,7 @@ def task_1_1(R: int, N: int, M: int):
 		hybrid_quick_sort(array, left = 0, right = len(array) - 1, k = 20)
 		time_sum += time() - start_time
 	
-	print(f'Average time for hybrid Quick-Insertion sort: {time_sum / len(arrays):.{4}f}', end = '\n\n')
+	print(f'Average time for hybrid Quick-Insertion sort: {time_sum / len(arrays):.{4}f}s', end = '\n\n')
 
 
 
@@ -276,7 +278,7 @@ def task_1_2(R: int, N: int, M: int):
 		hybrid_merge_sort(array, k = 20)
 		time_sum += time() - start_time
 	
-	print(f'Average Time for hybrid Merge-Insertion sort: {time_sum / len(arrays):.{4}f}', end = '\n\n')
+	print(f'Average time for hybrid Merge-Insertion sort: {time_sum / len(arrays):.{4}f}s', end = '\n\n')
 
 
 
