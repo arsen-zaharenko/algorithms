@@ -17,11 +17,12 @@
 Реализовать алгоритм хеширования методом умножения с разрешением коллизий цепочками переполнения,
 линейного зондирования и двойным хешированием. 
 В вычислительном эксперименте подобрать свою константу для метода умножения,
-сравнить ее с константой Кнута по наибольшей длине цепочек коллизий (множества ключей с равным хеш-значением)
-для P наборов из N случайных ключей от 1 до R, при длине хеш-таблицы M.
+сравнить ее с константой Кнута по наибольшей длине цепочек коллизий (множества элементов с равным хеш-значением)
+для P наборов из N случайных элементов от 1 до R, при длине хеш-таблицы M.
 '''
 
 from random import randint
+from math import modf
 
 
 
@@ -59,6 +60,68 @@ def interpolation_search(array: list, left: int, right: int, x: int, counter: li
 
 
 
+# HASH ALGORITHMS
+
+class HashTable:
+	def __init__(self, size: int, CONST: float):
+		self.size = size
+		self.CONST = CONST
+		self.dictionary = {}
+
+	def hash(self, key: int) -> int: 
+		key *= self.CONST
+		return int(self.size * (key - int(key)))
+
+	def add_element(self, element: int):
+		hash_of_element = self.hash(element)
+		if hash_of_element not in self.dictionary.keys():
+			self.dictionary[hash_of_element] = {element}
+		else:
+			self.dictionary[hash_of_element].add(element)
+
+	def add_collisions(self, collisions: dict):
+		for value in self.dictionary.values():
+			if len(value) not in collisions.keys():
+				collisions[len(value)] = 1
+			else:
+				collisions[len(value)] += 1 
+
+	def print(self):
+		for key in self.dictionary.keys():
+			print(f'{key}: {self.dictionary[key]}')
+		
+
+def multiplication_method(P:int, N: int, R: int, M: int, CONST: float):
+	KNUTH_CONST = 0.618033988749894
+
+	arrays = [[randint(1, R) for i in range(N)] for j in range(P)]
+	collisions = {}
+
+	for array in arrays:
+		hash_table = HashTable(M, CONST)
+
+		for element in array:
+			hash_table.add_element(element)
+
+		hash_table.add_collisions(collisions)
+
+	collisions_sum = 0
+	no_collisions = 0
+
+	for key in collisions.keys():
+		if key == 1:
+			no_collisions += collisions[key]
+			collisions_sum += collisions[key]
+		else:
+			collisions_sum += collisions[key]
+
+	if CONST == KNUTH_CONST:
+		print(f'Средний показатель коллизий для константы Кнута: {100 - 100 * no_collisions / collisions_sum:.{5}f}')
+	else:
+		print(f'Средний показатель коллизий для моей константы: {100 - 100 * no_collisions / collisions_sum:.{5}f}')
+
+
+
 # TASK 2.1
 
 def task_2_1(x: int, N: int, M: int):
@@ -66,14 +129,20 @@ def task_2_1(x: int, N: int, M: int):
 	array.sort()
 
 	counter = [0]
-	print(binary_search(array, left = 0, right = len(array) - 1, x = int(input()), counter = counter))
-	print(f'Найдено за {counter[0]} итераций')
-
-
+	index = binary_search(array, left = 0, right = len(array) - 1, x = int(x), counter = counter)
+	
+	if index == -1:
+		print('Бинарным поиск: число отсутствует')
+	else:
+		print(f'Бинарным поиск (число итераций): {counter[0]}')
 
 	counter = [0]
-	print(interpolation_search(array, left = 0, right = len(array) - 1, x = int(input()), counter = counter))
-	print(f'Найдено за {counter[0]} итераций')
+	index = interpolation_search(array, left = 0, right = len(array) - 1, x = int(x), counter = counter)
+	
+	if index == -1:
+		print('Интерполяционный поиск: число отсутствует')
+	else:
+		print(f'Интерполяционный поиск (число итераций): {counter[0]}')
 
 
 
@@ -86,15 +155,20 @@ def task_2_2():
 
 # TASK 2.3
 
-def task_2_3():
-	pass
+def task_2_3(P:int, N: int, R: int, M: int):
+	# {e} - {pi}
+	MY_CONST = 0.718281828459045 - 0.141592653589793
+	# {fi}
+	KNUTH_CONST = 0.618033988749894
 
+	multiplication_method(P, N, R, M, MY_CONST)
+	multiplication_method(P, N, R, M, KNUTH_CONST)
+	
 
 
 # Выполнить: бинарный и интерполяционный поиск, алгоритмы для BST, алгоритм хеширования.
 
 if __name__ == '__main__':
-	x = randint(0, 10000000)
-	task_2_1(x, N = 10000, M = 1000000)
+	task_2_1(x = input('Введите число, которое нужно найти: '), N = 10000, M = 1000000)
 	task_2_2()
-	task_2_3()
+	task_2_3(P = 1000, N = 1000, R = 2000, M = 2048)
