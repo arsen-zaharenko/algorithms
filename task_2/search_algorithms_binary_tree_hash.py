@@ -6,7 +6,7 @@
 
 Задание 2.2.
 Реализовать алгоритмы построения, обхода и балансировки дерева бинарного поиска (BST).
-На вход алгоритма подается последовательность целых положительных чисел a_1,a_2,...,a_n.
+На вход алгоритма подается последовательность целых положительных чисел a_1, a_2, ..., a_n.
 Программа должна строить BST, добавляя узлы в порядке последовательности.
 Реализовать обходы дерева по возрастанию узлов и по убыванию узлов.
 Реализовать алгоритм нахождения k-го минимального ключа в дереве;
@@ -22,7 +22,6 @@
 '''
 
 from random import randint
-from math import modf
 
 
 
@@ -60,9 +59,85 @@ def interpolation_search(array: list, left: int, right: int, x: int, counter: li
 
 
 
+# BST ALGORITHMS
+
+class Node:
+    def __init__(self, data: int):
+        self.left = None
+        self.right = None
+        self.data = data
+ 
+def insert(root: object, data: int):
+    if root is None:
+        return Node(data)
+    else:
+        if root.data == data:
+            return root
+        elif root.data < data:
+            root.right = insert(root.right, data)
+        else:
+            root.left = insert(root.left, data)
+    return root
+ 
+def search(root: object, data: int) -> object:
+    if root is None or root.data == data:
+        return root
+ 
+    if root.data < data:
+        return search(root.right, data)
+   
+    return search(root.left, data)
+
+def height(root: object) -> int:
+	if root is None:
+		return 0
+	hleft = height(root.left)
+	hright = height(root.right)  
+	
+	if hleft > hright:
+		return hleft + 1
+	
+	return hright + 1
+
+def is_balanced(root: object) -> bool:
+    if root is None:
+        return True
+    
+    lheight = height(root.left)
+    rheight = height(root.right)
+    
+    if(abs(lheight - rheight) > 1):
+        return False
+
+    lcheck = is_balanced(root.left)
+    rcheck = is_balanced(root.right)
+
+    if lcheck == rcheck == True:
+        return True
+
+def inorder_traversal(root: object):
+    if root:
+        inorder_traversal(root.left)
+        print(root.data, end = ' ')
+        inorder_traversal(root.right)
+
+def preorder_traversal(root: object):
+	if root:
+		print(root.data, end = ' ')
+		preorder_traversal(root.left)
+		preorder_traversal(root.right)
+
+def postorder_traversal(root: object):
+	if root:
+		postorder_traversal(root.left)
+		postorder_traversal(root.right)
+		print(root.data, end = ' ')
+
+
+
 # HASH ALGORITHMS
 
-class HashTable:
+class HashTable(object):
 	def __init__(self, size: int, CONST: float):
 		self.size = size
 		self.CONST = CONST
@@ -231,8 +306,29 @@ def task_2_1(x: int, N: int, M: int):
 
 # TASK 2.2
 
-def task_2_2():
-	pass
+#         50
+#      /      \
+#     30       70
+#    /   \    /  \
+#   20   40  60  80
+#       /  \
+#      34  41
+
+def task_2_2():	 
+	BST = Node(50)
+	for data in [30, 20, 40, 41, 34, 70, 60, 80]:
+		BST = insert(BST, data)  
+
+	print('Центрированный обход:')
+	inorder_traversal(BST)
+	print('\nПрямой обход:')
+	preorder_traversal(BST)
+	print('\nОбратный обход:')
+	postorder_traversal(BST) 
+
+	print(f'\nВысота дерева: {height(BST)}', end = '\n')
+	print('Дерево сбалансированно' if is_balanced(BST) else 'Дерево несбалансированно')
+	print()
 
 
 
@@ -255,7 +351,7 @@ def task_2_3(P:int, N: int, R: int, M: int):
 	
 
 
-# Выполнить: бинарный и интерполяционный поиск, алгоритмы для BST, алгоритм хеширования.
+# Выполнить: бинарный и интерполяционный поиск, алгоритмы для BST, алгоритмы хеширования.
 
 if __name__ == '__main__':
 	task_2_1(x = input('Введите число, которое нужно найти: '), N = 10000, M = 1000000)
