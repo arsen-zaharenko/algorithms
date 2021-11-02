@@ -391,17 +391,17 @@ def task_2_1(x: int, N: int, M: int):
 
 # TASK 2.2
 
-#	 UNBALANCED BST         		   AVL TREE
+#	      UNBALANCED BST         		     AVL TREE
 #
-#		  10							  30
-# 		   \							 /  \
-#  		    20          BALANCING	    20  40	
-#   		 \         ---------->     /  \   \
-#   		 30						  10  25  50
-#  		    /  \
-# 		   25  40
-#      		    \
-#      		    50
+#	      10				        30
+# 	        \				       /  \
+#  		 20               BALANCING	     20    40	
+#   		   \             ---------->        /  \     \
+#   		    30				  10    25    50
+#  		   /  \
+# 		 25    40
+#      		         \
+#      		          50
 
 def task_2_2(nodes: list):	 
 	BST = BinarySearchTree()
@@ -434,7 +434,7 @@ def task_2_2(nodes: list):
 
 # TASK 2.3
 
-def task_2_3(P:int, N: int, R: int, M: int):
+def task_2_3(P: int, N: int, R: int, M: int):
 	# {e} - {pi}
 	MY_CONST = 0.718281828459045 - 0.141592653589793
 	# {fi}
