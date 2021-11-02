@@ -61,77 +61,154 @@ def interpolation_search(array: list, left: int, right: int, x: int, counter: li
 
 # BST ALGORITHMS
 
-class Node:
+class Node(object):
     def __init__(self, data: int):
+        self.data = data
         self.left = None
         self.right = None
-        self.data = data
- 
-def insert(root: object, data: int):
-    if root is None:
-        return Node(data)
-    else:
-        if root.data == data:
-            return root
-        elif root.data < data:
-            root.right = insert(root.right, data)
+        self.height = 1
+
+
+
+class BinarySearchTree(object):
+    def insert(self, root: object, data: int) -> object:
+        if not root:
+            return Node(data)
         else:
-            root.left = insert(root.left, data)
-    return root
+            if root.data == data:
+                return root
+            elif root.data < data:
+                root.right = self.insert(root.right, data)
+            else:
+                root.left = self.insert(root.left, data)
+        return root
+
+    def search(root: object, data: int) -> object:
+        if root is None or root.data == data:
+            return root
  
-def search(root: object, data: int) -> object:
-    if root is None or root.data == data:
+        if root.data < data:
+            return self.search(root.right, data)
+   
+        return self.search(root.left, data)
+
+    def height(self, root: object) -> int:
+        if root is None:
+            return 0
+        hleft = self.height(root.left)
+        hright = self.height(root.right)  
+		
+        if hleft > hright:
+            return hleft + 1
+		
+        return hright + 1
+
+    def is_balanced(self, root: object) -> bool:
+        if root is None:
+            return True
+    
+        lheight = self.height(root.left)
+        rheight = self.height(root.right)
+    
+        if(abs(lheight - rheight) > 1):
+            return False
+
+        lcheck = self.is_balanced(root.left)
+        rcheck = self.is_balanced(root.right)
+
+        if lcheck == rcheck == True:
+            return True
+
+    def inorder_traversal(self, root: object):
+        if root:
+            self.inorder_traversal(root.left)
+            print(root.data, end = ' ')
+            self.inorder_traversal(root.right)
+
+    def preorder_traversal(self, root: object):
+        if root:
+            print(root.data, end = ' ')
+            self.preorder_traversal(root.left)
+            self.preorder_traversal(root.right)
+
+    def postorder_traversal(self, root: object):
+        if root:
+            self.postorder_traversal(root.left)
+            self.postorder_traversal(root.right)
+            print(root.data, end = ' ')
+
+		
+
+class AVL_Tree(object):
+    def insert(self, root: object, data: int) -> object:
+        if not root:
+            return Node(data)
+        elif data < root.data:
+            root.left = self.insert(root.left, data)
+        else:
+            root.right = self.insert(root.right, data)
+ 
+        root.height = 1 + max(self.height(root.left), self.height(root.right))
+ 
+        balance = self.balance(root)
+ 
+        if balance > 1 and data < root.left.data:
+            return self.right_rotate(root)
+ 
+        if balance < -1 and data > root.right.data:
+            return self.left_rotate(root)
+ 
+        if balance > 1 and data > root.left.data:
+            root.left = self.left_rotate(root.left)
+            return self.right_rotate(root)
+ 
+        if balance < -1 and data < root.right.data:
+            root.right = self.right_rotate(root.right)
+            return self.left_rotate(root)
+ 
         return root
  
-    if root.data < data:
-        return search(root.right, data)
-   
-    return search(root.left, data)
+    def left_rotate(self, root: object) -> object:
+        new_root = root.right
+        left_subtree = new_root.left
+ 
+        new_root.left = root
+        root.right = left_subtree
+ 
+        root.height = 1 + max(self.height(root.left), self.height(root.right))
+        new_root.height = 1 + max(self.height(new_root.left), self.height(new_root.right))
 
-def height(root: object) -> int:
-	if root is None:
-		return 0
-	hleft = height(root.left)
-	hright = height(root.right)  
-	
-	if hleft > hright:
-		return hleft + 1
-	
-	return hright + 1
-
-def is_balanced(root: object) -> bool:
-    if root is None:
-        return True
-    
-    lheight = height(root.left)
-    rheight = height(root.right)
-    
-    if(abs(lheight - rheight) > 1):
-        return False
-
-    lcheck = is_balanced(root.left)
-    rcheck = is_balanced(root.right)
-
-    if lcheck == rcheck == True:
-        return True
-
-def inorder_traversal(root: object):
-    if root:
-        inorder_traversal(root.left)
-        print(root.data, end = ' ')
-        inorder_traversal(root.right)
-
-def preorder_traversal(root: object):
-	if root:
-		print(root.data, end = ' ')
-		preorder_traversal(root.left)
-		preorder_traversal(root.right)
-
-def postorder_traversal(root: object):
-	if root:
-		postorder_traversal(root.left)
-		postorder_traversal(root.right)
-		print(root.data, end = ' ')
+        return new_root
+ 
+    def right_rotate(self, root: object) -> object:
+        new_root = root.left
+        right_subtree = new_root.right
+ 
+        new_root.right = root
+        root.left = right_subtree
+ 
+        root.height = 1 + max(self.height(root.left), self.height(root.right))
+        new_root.height = 1 + max(self.height(new_root.left), self.height(new_root.right))
+ 
+        return new_root
+ 
+    def height(self, node: object) -> int:
+        if not node:
+            return 0
+ 
+        return node.height
+ 
+    def balance(self, node: object) -> int:
+        if not node:
+            return 0
+ 
+        return self.height(node.left) - self.height(node.right)
+ 
+    def preorder_traversal(self, root: object):
+        if root:
+            print(root.data, end = ' ')
+            self.preorder_traversal(root.left)
+            self.preorder_traversal(root.right)
 
 
 
@@ -306,31 +383,43 @@ def task_2_1(x: int, N: int, M: int):
 
 # TASK 2.2
 
-#         50
-#      /      \
-#     30       70
-#    /   \    /  \
-#   20   40  60  80
-#       /  \
-#      34  41
+#	 UNBALANCED BST         		   AVL TREE
+#
+#		  10							  30
+# 		   \							 /  \
+#  		    20          BALANCING	    20  40	
+#   		 \         ---------->     /  \   \
+#   		 30						  10  25  50
+#  		    /  \
+# 		   25  40
+#      		    \
+#      		    50
 
 def task_2_2():	 
-	BST = Node(50)
-	for data in [30, 20, 40, 41, 34, 70, 60, 80]:
-		BST = insert(BST, data)  
+	BST = BinarySearchTree()
+	BST_root = None
+	AVL = AVL_Tree()
+	AVL_root = None
+
+	for data in [10, 20, 30, 40, 50, 25]:
+		BST_root = BST.insert(BST_root, data)  
+		AVL_root = AVL.insert(AVL_root, data)
 
 	print('Центрированный обход:')
-	inorder_traversal(BST)
+	BST.inorder_traversal(BST_root)
 	print('\nПрямой обход:')
-	preorder_traversal(BST)
+	BST.preorder_traversal(BST_root)
 	print('\nОбратный обход:')
-	postorder_traversal(BST) 
+	BST.postorder_traversal(BST_root) 
 
-	print(f'\nВысота дерева: {height(BST)}', end = '\n')
-	print('Дерево сбалансированно' if is_balanced(BST) else 'Дерево несбалансированно')
-	print()
+	print(f'\nВысота дерева: {BST.height(BST_root)}', end = '\n')
+	print('Дерево сбалансированно' if BST.is_balanced(BST_root) else 'Дерево несбалансированно')
 
+	print('\nПрямой обход AVL дерева:')
+	AVL.preorder_traversal(AVL_root)
+	print('\n')
 
+	
 
 # TASK 2.3
 
@@ -348,7 +437,7 @@ def task_2_3(P:int, N: int, R: int, M: int):
 
 	double_hashing(P, N, R, M, MY_CONST)
 	double_hashing(P, N, R, M, KNUTH_CONST)
-	
+
 
 
 # Выполнить: бинарный и интерполяционный поиск, алгоритмы для BST, алгоритмы хеширования.
