@@ -67,6 +67,7 @@ class Node(object):
         self.left = None
         self.right = None
         self.height = 1
+        self.left_subtree_cardinality = 0
 
 
 
@@ -80,17 +81,24 @@ class BinarySearchTree(object):
             elif root.data < data:
                 root.right = self.insert(root.right, data)
             else:
+                root.left_subtree_cardinality += 1
                 root.left = self.insert(root.left, data)
+
         return root
 
-    def search(root: object, data: int) -> object:
-        if root is None or root.data == data:
+    def kth_smallest(self, root: object, k: int) -> object:
+        if not root:
+            return None
+         
+        count = root.left_subtree_cardinality + 1
+     
+        if (count == k):
             return root
  
-        if root.data < data:
-            return self.search(root.right, data)
-   
-        return self.search(root.left, data)
+        if (count > k):
+            return self.kth_smallest(root.left, k)
+ 
+        return self.kth_smallest(root.right, k - count)
 
     def height(self, root: object) -> int:
         if root is None:
@@ -395,25 +403,28 @@ def task_2_1(x: int, N: int, M: int):
 #      		    \
 #      		    50
 
-def task_2_2():	 
+def task_2_2(nodes: list):	 
 	BST = BinarySearchTree()
 	BST_root = None
 	AVL = AVL_Tree()
 	AVL_root = None
 
-	for data in [10, 20, 30, 40, 50, 25]:
+	for data in nodes:
 		BST_root = BST.insert(BST_root, data)  
 		AVL_root = AVL.insert(AVL_root, data)
 
 	print('Центрированный обход:')
 	BST.inorder_traversal(BST_root)
-	print('\nПрямой обход:')
+	print('\n\nПрямой обход:')
 	BST.preorder_traversal(BST_root)
-	print('\nОбратный обход:')
+	print('\n\nОбратный обход:')
 	BST.postorder_traversal(BST_root) 
 
-	print(f'\nВысота дерева: {BST.height(BST_root)}', end = '\n')
+	print(f'\n\nВысота дерева: {BST.height(BST_root)}', end = '\n')
 	print('Дерево сбалансированно' if BST.is_balanced(BST_root) else 'Дерево несбалансированно')
+
+	k = randint(1, len(nodes))
+	print(f'{k} минимальный элемент: {BST.kth_smallest(BST_root, k).data}')
 
 	print('\nПрямой обход AVL дерева:')
 	AVL.preorder_traversal(AVL_root)
@@ -444,5 +455,5 @@ def task_2_3(P:int, N: int, R: int, M: int):
 
 if __name__ == '__main__':
 	task_2_1(x = input('Введите число, которое нужно найти: '), N = 10000, M = 1000000)
-	task_2_2()
+	task_2_2(nodes = [10, 20, 30, 40, 50, 25])
 	task_2_3(P = 1000, N = 1000, R = 2000, M = 2048)
