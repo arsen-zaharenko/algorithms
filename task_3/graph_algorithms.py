@@ -161,7 +161,7 @@ def parties(graph: list) -> list:
 	second_party = set()
 
 	for vertex, color in enumerate(colors):
-		first_party.add(vertex) if color is 1 else second_party.add(vertex)
+		first_party.add(vertex) if color == 1 else second_party.add(vertex)
 
 	return first_party, second_party
 
