@@ -41,13 +41,13 @@
 
 # GRAPH COMPONENTS
 
-def DFS(vertex: int, adjacents: list, visited: list, component: list, component_counter: list):
+def DFS_for_components(vertex: int, adjacents: list, visited: list, component: list, component_counter: list):
 	component[vertex] = component_counter[0]
 	visited[vertex] = True
 
 	for adjacent in adjacents[vertex]:
 		if not visited[adjacent]:
-			DFS(adjacent, adjacents, visited, component, component_counter)
+			DFS_for_components(adjacent, adjacents, visited, component, component_counter)
 
 def components(graph: list) -> list:
 	visited = [False] * len(graph)
@@ -56,7 +56,7 @@ def components(graph: list) -> list:
 
 	for vertex in enumerate(graph):
 		if not visited[vertex[0]]:
-			DFS(vertex[0], graph, visited, component, component_counter)
+			DFS_for_components(vertex[0], graph, visited, component, component_counter)
 			component_counter[0] += 1
 
 	for i in enumerate(component):
@@ -128,21 +128,60 @@ def eulerian_path(graph: list) -> list:
 
 
 
+# BIPARTITE GRAPH 
+
+def DFS_for_bipartite_graph(vertex: int, graph: list, colors: list, bipartition_flag: list):
+		for adjacent in graph[vertex]:
+			if not colors[adjacent]:
+				colors[adjacent] = 3 - colors[vertex]
+				DFS_for_bipartite_graph(adjacent, graph, colors, bipartition_flag) 
+			elif colors[adjacent] is colors[vertex]:
+				bipartition_flag[0] = False
+
+def is_bipartite(graph: list) -> bool:
+	colors = [0] * len(graph)
+	bipartition_flag = [True]
+	 
+	for vertex, adjacents in enumerate(graph): 
+		if not colors[vertex]: 
+			colors[vertex] = 1
+			DFS_for_bipartite_graph(vertex, graph, colors, bipartition_flag)
+
+	return bipartition_flag[0]
+
+def parties(graph: list) -> list:
+	colors = [0] * len(graph)
+
+	for vertex, adjacents in enumerate(graph): 
+		if not colors[vertex]: 
+			colors[vertex] = 1
+			DFS_for_bipartite_graph(vertex, graph, colors, [])
+
+	first_party = set()
+	second_party = set()
+
+	for vertex, color in enumerate(colors):
+		first_party.add(vertex) if color is 1 else second_party.add(vertex)
+
+	return first_party, second_party
+
+
+
 # TASK 3.1
 
 def task_3_1():
 	GRAPH = [
-				[3],
-				[4],
-				[4],
-				[0,4],
-				[1,2,3],
-				[6,8],
-				[5,8],
-				[],
-				[5,6],
-				[]
-			]
+			[3],
+			[4],
+			[4],
+			[0, 4],
+			[1, 2, 3],
+			[6, 8],
+			[5, 8],
+			[],
+			[5, 6],
+			[]
+		]
 
 	vertices, components_number = components(GRAPH)
 
@@ -151,22 +190,41 @@ def task_3_1():
 		print(f'{vertex}: {component}')
 
 	EULERIAN_GRAPH = [
-						[1,4],
-						[0,5,7,6],
-						[4,5],
-						[6,7],
-						[0,8,2,5],
-						[1,4,2,9],
-						[1,3],
-						[1,3],
-						[4,9],
-						[5,8]
-					]
+				[1, 4],
+				[0, 5, 7, 6],
+				[4, 5],
+				[6, 7],
+				[0, 8, 2, 5],
+				[1, 4, 2, 9],
+				[1, 3],
+				[1, 3],
+				[4, 9],
+				[5, 8]
+			]
 
 	if is_eulerian(EULERIAN_GRAPH):
 		print(f'\nЭйлеров цикл: {eulerian_path(EULERIAN_GRAPH)}')
 	else:
 		print('\nГраф не является эйлеровым')
+
+	BIPARTITE_GRAPH = [
+				[5, 7],
+				[2, 4, 6],
+				[1, 5],
+				[4],
+				[1, 3],
+				[0, 2],
+				[1, 9],
+				[0],
+				[9],
+				[6, 8]
+	]
+ 
+	if is_bipartite(BIPARTITE_GRAPH):
+		first_party, second_party = parties(BIPARTITE_GRAPH)
+		print(f'\nДоли двудольного графа:\n{first_party}\n{second_party}')
+	else:
+		print('\nГраф не является двудольным')
 
 
 # TASK 3.2
