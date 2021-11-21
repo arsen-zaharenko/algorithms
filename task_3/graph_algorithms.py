@@ -200,7 +200,7 @@ def task_3_1():
 				[1, 3],
 				[4, 9],
 				[5, 8]
-			]
+			 ]
 
 	if is_eulerian(EULERIAN_GRAPH):
 		print(f'\nЭйлеров цикл: {eulerian_path(EULERIAN_GRAPH)}')
@@ -218,7 +218,7 @@ def task_3_1():
 				[0],
 				[9],
 				[6, 8]
-	]
+			  ]
  
 	if is_bipartite(BIPARTITE_GRAPH):
 		first_party, second_party = parties(BIPARTITE_GRAPH)
