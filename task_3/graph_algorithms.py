@@ -36,3 +36,170 @@
 	только если все более эффективные для выполнения задачи t сотрудники, 
 	были назначены на другие более интересные для них задачи.
 '''
+
+
+
+# GRAPH COMPONENTS
+
+def DFS(vertex: int, adjacents: list, visited: list, component: list, component_counter: list):
+	component[vertex] = component_counter[0]
+	visited[vertex] = True
+
+	for adjacent in adjacents[vertex]:
+		if not visited[adjacent]:
+			DFS(adjacent, adjacents, visited, component, component_counter)
+
+def components(graph: list) -> list:
+	visited = [False] * len(graph)
+	component = [-1] * len(graph)
+	component_counter = [0]
+
+	for vertex in enumerate(graph):
+		if not visited[vertex[0]]:
+			DFS(vertex[0], graph, visited, component, component_counter)
+			component_counter[0] += 1
+
+	for i in enumerate(component):
+		component[i[0]] += 1
+
+	return [component, component_counter[0]]
+
+
+
+# EULERIAN GRAPH
+
+def graph_ribs(graph: list) -> list:
+	ribs = []
+
+	for vertex, adjacents in enumerate(graph):
+		for adjacent in adjacents:
+			if (vertex, adjacent) not in ribs and (adjacent, vertex) not in ribs: 
+				ribs.append((vertex, adjacent))
+	
+	return ribs
+
+def vertex_degree(vertex: int, ribs: list) -> int:
+    degree = 0
+
+    for rib in ribs:
+        if vertex is rib[0] or vertex is rib[1]:
+            degree += 1
+ 
+    return degree
+
+def rib_and_index(vertex: int, ribs: list) -> list:
+    rib = ()
+    index = -1
+ 
+    for i in range(len(ribs)):
+        if vertex is ribs[i][0] or vertex is ribs[i][1]:
+            rib, index = ribs[i], i
+            break
+ 
+    return rib, index
+
+def is_eulerian(graph: list) -> bool:
+	for adjacents in graph:
+		if not len(adjacents) or len(adjacents) % 2:
+			return False
+
+	return True  
+
+def eulerian_path(graph: list) -> list:
+	ribs = graph_ribs(graph)
+
+	stack = [ribs[0][0]]
+	path = []
+ 
+	while len(stack) > 0:
+		vertex = stack[len(stack) - 1]
+ 		
+		degree = vertex_degree(vertex, ribs)
+ 
+		if degree == 0:
+			stack.pop()
+			path.append(vertex)
+		else:
+			rib, index = rib_and_index(vertex, ribs)
+			ribs.pop(index)
+			stack.append(rib[1] if vertex is rib[0] else rib[0])
+	
+	return path
+
+
+
+# TASK 3.1
+
+def task_3_1():
+	GRAPH = [
+				[3],
+				[4],
+				[4],
+				[0,4],
+				[1,2,3],
+				[6,8],
+				[5,8],
+				[],
+				[5,6],
+				[]
+			]
+
+	vertices, components_number = components(GRAPH)
+
+	print(f'Количество компонент связности: {components_number}')
+	for vertex, component in enumerate(vertices):
+		print(f'{vertex}: {component}')
+
+	EULERIAN_GRAPH = [
+						[1,4],
+						[0,5,7,6],
+						[4,5],
+						[6,7],
+						[0,8,2,5],
+						[1,4,2,9],
+						[1,3],
+						[1,3],
+						[4,9],
+						[5,8]
+					]
+
+	if is_eulerian(EULERIAN_GRAPH):
+		print(f'\nЭйлеров цикл: {eulerian_path(EULERIAN_GRAPH)}')
+	else:
+		print('\nГраф не является эйлеровым')
+
+
+# TASK 3.2
+
+def task_3_2():
+	pass
+
+
+
+# TASK 3.3
+
+def task_3_3():
+	pass
+
+
+
+# TASK 3.4
+
+def task_3_4():
+	pass
+
+
+
+# TASK 3.5
+
+def task_3_5():
+	pass
+
+
+
+if __name__ == '__main__':
+	task_3_1()
+	task_3_2()
+	task_3_3()
+	task_3_4()
+	task_3_5()
