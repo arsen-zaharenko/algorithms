@@ -277,7 +277,7 @@ def distribute_work(graph: list) -> list:
 
 	return completed_tasks, uncompleted_tasks
 
-def distribute_work(opportunities_graph: list, performance_graph: list) -> list:
+def distribute_hard_work(opportunities_graph: list, performance_graph: list) -> list:
 	opportunities_list = [[employee, tasks, []] for employee, tasks in enumerate(opportunities_graph)]
 
 	performance_list = [[task, employees, False] for task, employees in enumerate(performance_graph)]
@@ -422,6 +422,8 @@ def task_3_4():
 
 	completed_tasks, uncompleted_tasks = distribute_work(EMPLOYEE_OPPORTUNITIES)
 
+	print()
+
 	for task in completed_tasks:
 		print(f'Сотрудник {task[1]} -> Задание {task[0]}')
 
@@ -434,11 +436,11 @@ def task_3_4():
 
 def task_3_5():
 	EMPLOYEE_OPPORTUNITIES = [
-					[5, 1],
-					[0, 1, 2, 4],
-					[5],
-					[2, 3, 5],
-					[4, 0, 5]
+					[5, 1, 9, 6],
+					[0, 1, 7, 2, 4],
+					[8, 9, 5],
+					[6, 2, 3, 5],
+					[4, 0, 9, 7, 5]
 				 ]
 
 	EMPLOYEE_PERFORMANCE = [
@@ -448,9 +450,15 @@ def task_3_5():
 					[3],
 					[1, 4],
 					[0, 2, 4, 3],
+					[3, 0],
+					[4, 1],
+					[2],
+					[2, 4, 0]
 			       ]
 
-	opportunities_list, performance_list = distribute_work(EMPLOYEE_OPPORTUNITIES, EMPLOYEE_PERFORMANCE)
+	opportunities_list, performance_list = distribute_hard_work(EMPLOYEE_OPPORTUNITIES, EMPLOYEE_PERFORMANCE)
+
+	print()
 
 	for employee, tasks, completed_tasks in opportunities_list:
 		if completed_tasks:
@@ -465,8 +473,8 @@ def task_3_5():
 
 
 if __name__ == '__main__':
-	#task_3_1()
-	#task_3_2()
-	#task_3_3()
-	#task_3_4()
+	task_3_1()
+	task_3_2()
+	task_3_3()
+	task_3_4()
 	task_3_5()
