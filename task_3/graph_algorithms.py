@@ -386,12 +386,12 @@ def task_3_3():
 
 def task_3_4():
 	EMPLOYEE_OPPORTUNITIES = [
-			[0, 1],
-			[2],
-			[3],
-			[0],
-			[1, 2, 3]
-		]
+					[0, 1],
+					[2],
+					[3],
+					[0],
+					[1, 2, 3]
+				 ]
 
 	completed_tasks, uncompleted_tasks = distribute_work(EMPLOYEE_OPPORTUNITIES)
 
@@ -407,12 +407,12 @@ def task_3_4():
 
 def task_3_5():
 	EMPLOYEE_OPPORTUNITIES = [
-			[]
-		]
+					[]
+				 ]
 
 	EMPLOYEE_PERFORMANCE = [
-			[]
-		]
+					[]
+			       ]
 
 
 
