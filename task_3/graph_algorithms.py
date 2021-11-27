@@ -209,7 +209,7 @@ def prim(graph: list) -> list:
 
 
 
-# ADDITIONAL FUNCTIONS
+# USEFUL FUNCTIONS
 
 def break_rules(graph: list) -> list:
 	for i, x in enumerate(graph):
@@ -248,6 +248,35 @@ def min_key(graph: list, key: int, visited: set) -> int:
 			min_index = v
  
 	return min_index
+
+def distribute_work(graph: list) -> list:
+	completed_tasks = [[i, None, False] for i, j in enumerate(graph)]
+	uncompleted_tasks = []
+	unbusy_employee = [i for i, j in enumerate(graph)]
+
+	tasks_list = [(employee, tasks) for employee, tasks in enumerate(graph)]
+	tasks_list.sort(key = lambda info: len(info[1]))
+
+	for employee, tasks in tasks_list:
+		for task in tasks:
+			if not completed_tasks[task][-1]:
+				completed_tasks[task][1] = employee
+				completed_tasks[task][-1] = True
+				unbusy_employee.remove(employee)
+				break
+
+	for task in completed_tasks:
+		if not task[-1]:
+			task[1] = unbusy_employee.pop()
+			task[-1] = True
+			uncompleted_tasks.append(task)
+			completed_tasks.remove(task)
+
+	completed_tasks.sort(key = lambda info: info[1])
+	uncompleted_tasks.sort(key = lambda info: info[1])
+
+	return completed_tasks, uncompleted_tasks
+
 
 
 # TASK 3.1
@@ -310,6 +339,7 @@ def task_3_1():
 		print('\nГраф не является двудольным')
 
 
+
 # TASK 3.2
 
 def task_3_2():
@@ -332,6 +362,7 @@ def task_3_2():
 		print(f'{crossroad[0]}: {crossroad[1]}')
 	
 
+
 # TASK 3.3
 
 def task_3_3():
@@ -350,23 +381,45 @@ def task_3_3():
 		print(f'{rib[0][0]} - {rib[0][1]}: {rib[1]}')
 
 
+
 # TASK 3.4
 
 def task_3_4():
-	pass
+	EMPLOYEE_OPPORTUNITIES = [
+			[0, 1],
+			[2],
+			[3],
+			[0],
+			[1, 2, 3]
+		]
+
+	completed_tasks, uncompleted_tasks = distribute_work(EMPLOYEE_OPPORTUNITIES)
+
+	for task in completed_tasks:
+		print(f'Сотрудник {task[1]} -> Задание {task[0]}')
+
+	for task in uncompleted_tasks:
+		print(f'Обучить сотрудника {task[1]} -> Задание {task[0]}')
 
 
 
 # TASK 3.5
 
 def task_3_5():
-	pass
+	EMPLOYEE_OPPORTUNITIES = [
+			[]
+		]
+
+	EMPLOYEE_PERFORMANCE = [
+			[]
+		]
+
 
 
 
 if __name__ == '__main__':
-	task_3_1()
-	task_3_2()
-	task_3_3()
-	task_3_4()
+	#task_3_1()
+	#task_3_2()
+	#task_3_3()
+	#task_3_4()
 	task_3_5()
