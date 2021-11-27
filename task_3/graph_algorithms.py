@@ -277,6 +277,33 @@ def distribute_work(graph: list) -> list:
 
 	return completed_tasks, uncompleted_tasks
 
+def distribute_work(opportunities_graph: list, performance_graph: list) -> list:
+	opportunities_list = [[employee, tasks, []] for employee, tasks in enumerate(opportunities_graph)]
+
+	performance_list = [[task, employees, False] for task, employees in enumerate(performance_graph)]
+
+	for task, employees, completed in performance_list:
+		for employee in employees:
+			employee_tasks = opportunities_list[employee][1]
+			task_index = employee_tasks.index(task)
+			more_intresting_tasks = employee_tasks[:task_index]
+			
+			count = len(more_intresting_tasks)
+
+			for more_intresting_task in more_intresting_tasks:
+				if performance_list[more_intresting_task][-1] and more_intresting_task not in opportunities_list[employee][-1]:
+					count -= 1
+
+			if not count:
+				performance_list[task][-1] = True
+				opportunities_list[employee][-1].append(task)
+				break
+
+	opportunities_list.sort(key = lambda info: info[0])
+	performance_list.sort(key = lambda info: info[0])
+
+	return opportunities_list, performance_list
+
 
 
 # TASK 3.1
@@ -407,13 +434,33 @@ def task_3_4():
 
 def task_3_5():
 	EMPLOYEE_OPPORTUNITIES = [
-					[]
+					[5, 1],
+					[0, 1, 2, 4],
+					[5],
+					[2, 3, 5],
+					[4, 0, 5]
 				 ]
 
 	EMPLOYEE_PERFORMANCE = [
-					[]
+					[4, 1],
+					[0, 1],
+					[3, 1],
+					[3],
+					[1, 4],
+					[0, 2, 4, 3],
 			       ]
 
+	opportunities_list, performance_list = distribute_work(EMPLOYEE_OPPORTUNITIES, EMPLOYEE_PERFORMANCE)
+
+	for employee, tasks, completed_tasks in opportunities_list:
+		if completed_tasks:
+			print(f'Сотрудник {employee} получил задания: {completed_tasks}')
+		else:
+			print(f'Сотрудник {employee} не получил задания')
+			
+	for task, employees, completed in performance_list:
+		if not completed:
+			print(f'Задание {task} никто не получил')
 
 
 
