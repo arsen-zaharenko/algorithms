@@ -169,7 +169,7 @@ def parties(graph: list) -> list:
 
 
 
-# FLOYD WARSHALL ALGORITHM
+# FLOYD-WARSHALL ALGORITHM
 
 def floyd_warshall(graph: list) -> list:
     distances = list(map(lambda i: list(map(lambda j: j, i)), graph))
@@ -314,14 +314,14 @@ def task_3_1():
 
 def task_3_2():
 	GRAPH = [
-				[0, INF, INF, INF, INF, 3, 7],
-				[INF, 0, 3, 1, INF, INF, INF],
-				[INF, 6, 0, INF, INF, INF, INF],
-				[INF, INF, 4, 0, INF, INF, 3],
-				[INF, INF, INF, 1, 0, 1, INF],
-				[5, INF, INF, INF, INF, 0, INF],
-				[6, 9, INF, 11, INF, INF, 0]
-			]
+			[0, INF, INF, INF, INF, 3, 7],
+			[INF, 0, 3, 1, INF, INF, INF],
+			[INF, 6, 0, INF, INF, INF, INF],
+			[INF, INF, 4, 0, INF, INF, 3],
+			[INF, INF, INF, 1, 0, 1, INF],
+			[5, INF, INF, INF, INF, 0, INF],
+			[6, 9, INF, 11, INF, INF, 0]
+		]
 
 	min_distance, crossroads = most_convenient_crossroads(
 		floyd_warshall(
@@ -336,12 +336,12 @@ def task_3_2():
 
 def task_3_3():
 	GRAPH = [
-				[0, 1, 1, 2, 5],
-				[1, 0, 3, 5, 3],
-				[1, 3, 0, 4, 1],
-				[2, 5, 4, 0, 2],
-				[5, 3, 1, 2, 0]
-			]
+			[0, 1, 1, 2, 5],
+			[1, 0, 3, 5, 3],
+			[1, 3, 0, 4, 1],
+			[2, 5, 4, 0, 2],
+			[5, 3, 1, 2, 0]
+		]
 
 	ribs = prim(GRAPH)
 
