@@ -37,6 +37,8 @@
 	были назначены на другие более интересные для них задачи.
 '''
 
+from sys import maxsize as INF 
+
 
 
 # GRAPH COMPONENTS
@@ -161,10 +163,91 @@ def parties(graph: list) -> list:
 	second_party = set()
 
 	for vertex, color in enumerate(colors):
-		first_party.add(vertex) if color is 1 else second_party.add(vertex)
+		first_party.add(vertex) if color == 1 else second_party.add(vertex)
 
 	return first_party, second_party
 
+
+
+# FLOYD WARSHALL ALGORITHM
+
+def floyd_warshall(graph: list) -> list:
+    distances = list(map(lambda i: list(map(lambda j: j, i)), graph))
+
+    for k, x in enumerate(graph):
+    	for i, x in enumerate(graph):
+    		for j, x in enumerate(graph):
+    			distances[i][j] = min(distances[i][j], distances[i][k] + distances[k][j])
+
+    return distances
+
+
+
+# PRIM'S MINIMUM SPANNING TREE ALGORITHM
+
+def prim(graph: list) -> list:
+	key = [INF] * len(graph)
+	parent = [None] * len(graph)
+	visited = [False] * len(graph)
+     
+	key[0] = 0	
+	parent[0] = -1
+ 
+	for cout, x in enumerate(graph):
+		u = min_key(graph, key, visited)
+
+		visited[u] = True
+
+		for v, x in enumerate(graph):
+			if graph[u][v] > 0 and visited[v] is False and key[v] > graph[u][v]:
+				key[v] = graph[u][v]
+				parent[v] = u
+
+	ribs = [((parent[i] + 1, i + 1), graph[i][parent[i]]) for i in range(1, len(graph))]
+
+	return ribs
+
+
+
+# ADDITIONAL FUNCTIONS
+
+def break_rules(graph: list) -> list:
+	for i, x in enumerate(graph):
+		for j, x in enumerate(graph):
+			if i < j:
+				graph[i][j] = graph[j][i] = min(graph[i][j], graph[j][i])
+
+	return graph
+
+def most_convenient_crossroads(graph: list) -> int:
+	crossroads = []
+	max_distances_list = []
+
+	for crossroads, distances_list in enumerate(graph):
+		max_distances_list.append((crossroads, max(distances_list)))
+
+	min_distances_list = [] 
+	min_distance = max_distances_list[0][1]
+
+	for crossroads in max_distances_list:
+		if crossroads[1] < min_distance:
+			min_distance = crossroads[1]
+
+	for crossroads in max_distances_list:
+		if crossroads[1] == min_distance:
+			min_distances_list.append((crossroads[0], graph[crossroads[0]]))
+
+	return min_distance, min_distances_list
+
+def min_key(graph: list, key: int, visited: set) -> int:
+	min = INF
+ 
+	for v, x in enumerate(graph):
+		if key[v] < min and visited[v] is False:
+			min = key[v]
+			min_index = v
+ 
+	return min_index
 
 
 # TASK 3.1
@@ -230,15 +313,41 @@ def task_3_1():
 # TASK 3.2
 
 def task_3_2():
-	pass
+	GRAPH = [
+				[0, INF, INF, INF, INF, 3, 7],
+				[INF, 0, 3, 1, INF, INF, INF],
+				[INF, 6, 0, INF, INF, INF, INF],
+				[INF, INF, 4, 0, INF, INF, 3],
+				[INF, INF, INF, 1, 0, 1, INF],
+				[5, INF, INF, INF, INF, 0, INF],
+				[6, 9, INF, 11, INF, INF, 0]
+			]
 
+	min_distance, crossroads = most_convenient_crossroads(
+		floyd_warshall(
+		break_rules(GRAPH)))
 
+	print(f'\nСамые удобные перекрестки с максимальным расстояние {min_distance}:')
+	for crossroad in crossroads:
+		print(f'{crossroad[0]}: {crossroad[1]}')
+	
 
 # TASK 3.3
 
 def task_3_3():
-	pass
+	GRAPH = [
+				[0, 1, 1, 2, 5],
+				[1, 0, 3, 5, 3],
+				[1, 3, 0, 4, 1],
+				[2, 5, 4, 0, 2],
+				[5, 3, 1, 2, 0]
+			]
 
+	ribs = prim(GRAPH)
+
+	print('\nУзлы, которые требуется соединить:')
+	for rib in ribs:
+		print(f'{rib[0][0]} - {rib[0][1]}: {rib[1]}')
 
 
 # TASK 3.4
