@@ -1,0 +1,7 @@
+abAB=
+a>1 a<2 A>4 a>4 a>5 a<6 _<8 None None
+b>1 b<2 B>5 b>4 b>5 b<6 _<9 None None
+None None None None None a>3 None None None
+None None None None None b>3 None None None
+None None _>7 =>4 =>5 =<6 None None None
+=<2 _>3 _>7 a.6 b.6 None _<0 a>3 b>3
