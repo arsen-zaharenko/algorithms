@@ -78,11 +78,11 @@ def crossover(generation: list, selection_results: list) -> list:
 
 	new_generation = []
 	if len(good_chromosomes) == 1:
-		new_generation = [good_chromosomes[0][:4] + [bad_chromosomes[i][-1]] for i in range(4)]
+		new_generation = [good_chromosomes[0][:4] + [bad_chromosomes[i][randint(0, 4)]] for i in range(4)]
 		new_generation += good_chromosomes
 	elif 1 < len(good_chromosomes) < 5:
 		for chromosome in good_chromosomes:
-			new_generation += [chromosome[:4] + [bad_chromosomes[i][-1]] for i in range(len(bad_chromosomes))]
+			new_generation += [chromosome[:4] + [bad_chromosomes[i][randint(0, 4)]] for i in range(len(bad_chromosomes))]
 		new_generation += good_chromosomes
 	else:
 		best_chromosome = [generation[0], survival_probabilities[0]]
@@ -95,11 +95,11 @@ def crossover(generation: list, selection_results: list) -> list:
 
 	return new_generation
 
-
-
 def mutation(generation: list):
-	pass
+	for chromosome in generation:
+		chromosome[randint(0, 4)] += randint(-3, 3)
 
+	return generation
 
 
 # START
@@ -117,33 +117,24 @@ def task_5():
 	powers, result = read_powers('1.txt')
 	equation_form = get_equation_form(powers, result)
 	
-	print(equation_form)
-
-	
 	initial_generation = generation()
-	for i in initial_generation:
-		print(i)
-	print()
-
 	fitness_scores, average_score = fitness(result, powers, initial_generation)
-	print(average_score)
-	for i in fitness_scores:
-		print(i)
 
-	previous_generation = initial_generation
-	#while True:
-	selection_results = selection(fitness_scores, average_score)
-	next_generation = crossover(previous_generation, selection_results)
-	print()
-	for i in next_generation:
-		print(i)
-
-	fitness_scores, average_score = fitness(result, powers, next_generation)
-	print(average_score)
-	for i in fitness_scores:
-		print(i)
-
-
+	previous_generation = next_generation = initial_generation
+	generations_count = 1
+	while True:
+		generations_count += 1
+		selection_results = selection(fitness_scores, average_score)
+		next_generation = mutation(crossover(previous_generation, selection_results))
+		previous_generation = next_generation
+		fitness_scores, average_score = fitness(result, powers, next_generation)
+		
+		if 0 in fitness_scores:
+			solution = next_generation[fitness_scores.index(0)] 
+			print(f'Solution: {solution}\nGenerations count: {generations_count}')
+			break
 
 if __name__ == '__main__':
 	task_5()
+	powers, result = read_powers('1.txt')
+	print(function([0, -18, -2, 0, -5], powers))
