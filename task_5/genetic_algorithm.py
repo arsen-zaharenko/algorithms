@@ -1,7 +1,7 @@
 '''
 Задание 5.
 Решить диофантовое уравнение, используя генетический алгоритм.
-''' 
+'''
 
 import matplotlib.pyplot as plt
 from random import randint
