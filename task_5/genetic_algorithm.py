@@ -5,7 +5,7 @@
 
 import matplotlib.pyplot as plt
 from random import randint
-from time import sleep
+
 
 
 # USEFUL FUNCTIONS
@@ -44,27 +44,45 @@ def get_equation_form(powers: list, result: int) -> str:
 
 	return f'{equation} = {result}'
 
+
+# Trend Equation: y = b * x + a
+
+def trend_coefficients(chromosomes: list):
+	n_1 = len(chromosomes)
+	m_1 = sum(range(len(chromosomes)))
+	k_1 = sum(chromosomes)
+	n_2 = m_1
+	m_2 = sum([i*i for i in range(len(chromosomes))])
+	k_2 = sum([chromosome*i for i, chromosome in enumerate(chromosomes)])
+
+	b = (n_1*k_2 - n_2*k_1) / (n_1*m_2 - n_2*m_1)
+	a = (k_1 - m_1*b) / n_1
+
+	return [a, b]
+
 def draw_line_segment(point_1: list, point_2: list, color: str):
 	plt.plot([point_1[0], point_2[0]], [point_1[1], point_2[1]], color=color)
 
-def plot(average_chromosomes: list, best_chromosomes: list, generations_scores: list):
+def plot(average_chromosomes: list, best_chromosomes: list):
 	average_chromosomes_vertices = []
-	best_chromosomes_vertices = []	
+	best_chromosomes_vertices = []
 	for i in range(len(average_chromosomes)):
 		average_chromosomes_vertices.append([i, average_chromosomes[i]])
 		best_chromosomes_vertices.append([i, best_chromosomes[i]])
-
+		
 	for i in range(len(best_chromosomes_vertices) - 1):
 		draw_line_segment(average_chromosomes_vertices[i], average_chromosomes_vertices[i + 1], 'red')
 		draw_line_segment(best_chromosomes_vertices[i], best_chromosomes_vertices[i + 1], 'blue')
-	
-	for i, scores in enumerate(generations_scores):
-		for score in scores:
-			plt.scatter(i, score, color='green', s=12)
 
 	plt.plot([0, len(best_chromosomes_vertices) - 1], [0, 0], color='black', linestyle='dashed')
 
+	a, b = trend_coefficients(average_chromosomes)
+	plt.plot([0, len(average_chromosomes_vertices) - 1], [a, a + b * (len(average_chromosomes_vertices) - 1)], color='red', linestyle='dashed')
+	a, b = trend_coefficients(best_chromosomes)
+	plt.plot([0, len(best_chromosomes_vertices) - 1], [a, a + b * (len(best_chromosomes_vertices) - 1)], color='blue', linestyle='dashed')
+
 	plt.show()
+
 
 
 # GENETIC ALGORITHM
@@ -80,17 +98,22 @@ def generation(population: int) -> list:
 
 def fitness(result: int, powers: list, generation: list) -> list:
 	fitness_scores = [abs(function(chromosome, powers) - result) for i, chromosome in enumerate(generation)]
-	average_fitness = sum(fitness_scores) / len(fitness_scores)
 
-	return [fitness_scores, average_fitness]
+	return fitness_scores
 
-def selection(fitness_scores: list, average_fitness: float) -> list:
+def fitness_average(fitness_scores: list, selection_results: list) -> int:
+	survival_coefficient, survival_probabilities = selection_results
+	average_fitness = sum([survival_probability * score for survival_probability, score in zip(survival_probabilities, fitness_scores)])
+
+	return average_fitness
+
+def selection(fitness_scores: list) -> list:
 	survival_coefficient = sum([1 / score if score else 1 for score in fitness_scores])
 	survival_probabilities = [1 / score / survival_coefficient if score else 1 for score in fitness_scores]
 
 	return [survival_coefficient, survival_probabilities]
 
-def crossover(result: int, powers: list, generation: list, selection_results: list) -> list:
+def crossover(result: int, powers: list, population: int, generation: list, selection_results: list) -> list:
 	survival_coefficient, survival_probabilities = selection_results
 	good_chromosomes = []
 	bad_chromosomes = []
@@ -98,29 +121,33 @@ def crossover(result: int, powers: list, generation: list, selection_results: li
 	for chromosome, probability in zip(generation, survival_probabilities):
 		good_chromosomes.append(chromosome) if probability > survival_coefficient else bad_chromosomes.append(chromosome)
 
+	best_chromosome = [generation[0], survival_probabilities[0]]
+	for chromosome, probability in zip(generation[1:], survival_probabilities[1:]):
+		if best_chromosome[1] < probability:
+			best_chromosome = [chromosome, probability]
+	best_chromosome = best_chromosome[0]
+
 	new_generation = []
 	if len(good_chromosomes) == 1:
 		new_generation = [good_chromosomes[0][:4] + [bad_chromosomes[i][randint(0, 4)]] for i in range(4)]
 		new_generation += good_chromosomes
-	elif 1 < len(good_chromosomes) < 5:
+	elif 1 < len(good_chromosomes) < population:
 		for chromosome in good_chromosomes:
 			new_generation += [chromosome[:4] + [bad_chromosomes[i][randint(0, 4)]] for i in range(len(bad_chromosomes))]
 		new_generation += good_chromosomes
 	else:
-		best_chromosome = [generation[0], survival_probabilities[0]]
-		for chromosome, probability in zip(generation[1:], survival_probabilities[1:]):
-			if best_chromosome[1] < probability:
-				best_chromosome = [chromosome, probability]
-		best_chromosome = best_chromosome[0]
-		
 		new_generation = [best_chromosome[:3] + chromosome[3:] for chromosome in generation]
 
-	fitness_scores, average_fitness = fitness(result, powers, new_generation)
-	new_selection_results = selection(fitness_scores, average_fitness)
+	new_generation.pop(randint(0, len(new_generation) - 1))
+	new_generation.append(best_chromosome)
+
+	fitness_scores = fitness(result, powers, new_generation)
+	new_selection_results = selection(fitness_scores)
+	average_fitness = fitness_average(fitness_scores, new_selection_results)
 
 	return [new_generation, new_selection_results, fitness_scores, average_fitness]
 
-def mutation(result: int, powers: list, generation: list, selection_results: list):
+def mutation(result: int, powers: list, population: int, generation: list, selection_results: list):
 	survival_coefficient, survival_probabilities = selection_results
 	best_chromosome = [generation[0], survival_probabilities[0]]
 	for chromosome, probability in zip(generation[1:], survival_probabilities[1:]):
@@ -129,94 +156,87 @@ def mutation(result: int, powers: list, generation: list, selection_results: lis
 	best_chromosome = best_chromosome[0]
 
 	for chromosome in generation:
-		chromosome[randint(0, 4)] += randint(-3, 3)
+		chromosome[randint(0, 4)] += randint(-1, 1)
 	generation.pop(randint(0, len(generation) - 1))
 	generation.append(best_chromosome)
 
-	fitness_scores, average_fitness = fitness(result, powers, generation)
+	fitness_scores = fitness(result, powers, generation)
+	new_selection_results = selection_results
+	average_fitness = fitness_average(fitness_scores, selection_results)
 
-	if len(generation) != 5:
+	if len(generation) != population:
 		survivors = [[chromosome, fitness] for chromosome, fitness in zip(generation, fitness_scores)]
-		survivors = sorted(survivors, key=lambda survivor: survivor[1])[:5]
+		survivors = sorted(survivors, key=lambda survivor: survivor[1])[:population]
 		generation = [survivor[0] for survivor in survivors]
-		fitness_scores, average_fitness = fitness(result, powers, generation)
-	
-	new_selection_results = selection(fitness_scores, average_fitness)
+		fitness_scores = fitness(result, powers, generation)
+		new_selection_results = selection(fitness_scores)
+		average_fitness = fitness_average(fitness_scores, new_selection_results)
 
 	return [generation, new_selection_results, fitness_scores, average_fitness]
 
 def genetic_algorithm(data: str, generations_limit: int, population: int):
 	powers, result = read_powers(data)
 	equation_form = get_equation_form(powers, result)
-
-	average_chromosomes = []
-	best_chromosomes = []
-	generations_scores = []
 	
 	next_generation = initial_generation = generation(population)
-	fitness_scores, average_fitness = fitness(result, powers, initial_generation)
+	fitness_scores = fitness(result, powers, initial_generation)
+	selection_results = selection(fitness_scores)
+	average_fitness = fitness_average(fitness_scores, selection_results)
 
-	generations_count = 1
-	bad_generation_count = 3
+	average_chromosomes = [average_fitness]
+	best_chromosomes = [min(fitness_scores)]
+
+	generations_count = 0
 	while True:
-		generations_count += 1
 		if generations_count > generations_limit:
-			generations_count = 1
-			bad_generation_count = 3
+			generations_count = 0
+			
 			next_generation = initial_generation = generation(population)
-			fitness_scores, average_fitness = fitness(result, powers, initial_generation)
+			fitness_scores = fitness(result, powers, initial_generation)
+			selection_results = selection(fitness_scores)
+			average_fitness = fitness_average(fitness_scores, selection_results)
 
 			average_chromosomes = []
 			best_chromosomes = []
-			generations_scores = []
 			continue
 
-		selection_results = selection(fitness_scores, average_fitness)
-		crossover_generation, crossover_selection_results, crossover_fitness_scores, crossover_average_fitness = crossover(result, powers, next_generation, selection_results)
-
-		mutation_generation, mutation_selection_results, mutation_fitness_scores, mutation_average_fitness = mutation(result, powers, crossover_generation, crossover_selection_results)
-
-		if 1 - average_fitness / mutation_average_fitness > 0.1:
-			bad_generation_count -= 1
-
-		if bad_generation_count:
-			next_generation = mutation_generation
-			fitness_scores, average_fitness = mutation_fitness_scores, mutation_average_fitness
-			best_chromosomes.append(min(fitness_scores))
-			average_chromosomes.append(average_fitness)
-			generations_scores.append(fitness_scores)
-		else:
-			bad_generation_count = 3
-			next_generation = generation(population)
-			fitness_scores, average_fitness = fitness(result, powers, next_generation)
-			best_chromosomes.append(None)
-			average_chromosomes.append(None)
-			generations_scores.append([])
+		crossover_generation, crossover_selection_results, crossover_fitness_scores, crossover_average_fitness = crossover(result, powers, population, next_generation, selection_results)
+		
+		mutation_generation, mutation_selection_results, mutation_fitness_scores, mutation_average_fitness = mutation(result, powers, population, crossover_generation, crossover_selection_results)
+		
+		generations_count += 1
+		selection_results = mutation_selection_results
+		next_generation = mutation_generation
+		fitness_scores, average_fitness = mutation_fitness_scores, mutation_average_fitness
+		best_chromosomes.append(min(fitness_scores))
+		average_chromosomes.append(average_fitness)
 
 		if 0 in fitness_scores:
 			solution = next_generation[fitness_scores.index(0)] 
 			print(f'Solution for {equation_form}:\n {solution}\nGenerations count: {generations_count}\n')
-			plot(average_chromosomes, best_chromosomes, generations_scores)
+			plot(average_chromosomes, best_chromosomes)
 			break
 
 
 
-'''
-START
-Generate the initial population
-Compute fitness
-REPEAT
-    Selection
-    Crossover
-    Mutation
-    Compute fitness
-UNTIL population has converged
-STOP
-'''
+# TASK 5
+
+# START
+# Generate the initial population
+# Compute fitness
+# REPEAT
+#     Selection
+#     Crossover
+#     Mutation
+#     Compute fitness
+# UNTIL population has converged
+# STOP
 
 def task_5():
-	genetic_algorithm('1.txt', 30, 5)
-	#genetic_algorithm('2.txt', 30, 5)
+	genetic_algorithm('equation_1.txt', 20, 10)
+	genetic_algorithm('equation_2.txt', 20, 10)
+
+
 
 if __name__ == '__main__':
 	task_5()
