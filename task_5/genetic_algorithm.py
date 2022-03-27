@@ -55,8 +55,12 @@ def trend_coefficients(chromosomes: list):
 	m_2 = sum([i*i for i in range(len(chromosomes))])
 	k_2 = sum([chromosome*i for i, chromosome in enumerate(chromosomes)])
 
-	b = (n_1*k_2 - n_2*k_1) / (n_1*m_2 - n_2*m_1)
-	a = (k_1 - m_1*b) / n_1
+	a = b = 0
+	try:
+		b = (n_1*k_2 - n_2*k_1) / (n_1*m_2 - n_2*m_1)
+		a = (k_1 - m_1*b) / n_1
+	except ZeroDivisionError:
+		return [0, 0]
 
 	return [a, b]
 
