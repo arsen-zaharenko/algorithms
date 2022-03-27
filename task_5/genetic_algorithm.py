@@ -30,6 +30,8 @@ def get_equation_form(powers: list, result: int) -> str:
 
 	for i in range(len(u_pows)):
 		term = ''
+		if [u_pows[i], w_pows[i], x_pows[i], y_pows[i], z_pows[i]] == [0]*5:
+			term = '1'
 		if u_pows[i]:
 			term += f'(u^{u_pows[i]})' if u_pows[i] > 1 else 'u'	
 		if w_pows[i]:
