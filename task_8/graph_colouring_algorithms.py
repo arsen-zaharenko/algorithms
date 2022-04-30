@@ -66,6 +66,17 @@ def plot_graph(graph: list, vertices:list, colors = None):
 def or_sum(a: list, b: list):
 	return [1 if 1 in [a[i], b[i]] else 0 for i in range(len(a))]
 
+def vertex_neighbours(graph: list, vertex: int) -> list:
+	return [index for index in range(len(graph[vertex])) if graph[vertex][index]]
+
+def get_amount_color(colored: list, vertices: list, color_number: int) -> int:
+    color_counter = 0;  
+    for vertex in vertices:
+        if (colored[vertex] == color_number):
+            color_counter += 1;
+    
+    return color_counter;
+
 
 
 # GREEDY ALGORITHM
@@ -115,9 +126,68 @@ def greedy(graph: list) -> list:
 # DSATUR ALGORITHM
 
 def dsatur(graph: list) -> list:
-	pass
-
+    degrees = list()
+    saturation_degrees = [0] * len(graph)    
+    colored = [0] * len(graph)
+    uncolored_vertices = set(range(len(graph)))
     
+    color_counter = index_maximum_degree = maximum_degree = 0
+    for i, row in enumerate(graph):
+        degrees.append((sum(row), i))
+        
+        if (degrees[i][0] > maximum_degree):
+            (maximum_degree, vertex) = degrees[i]
+            index_maximum_degree = i    
+
+    neighbours = vertex_neighbours(graph, index_maximum_degree)
+    for neighbour in neighbours:
+        saturation_degrees[neighbour] += 1
+    
+    colored[index_maximum_degree] = color_counter
+    uncolored_vertices.remove(index_maximum_degree)
+
+    while uncolored_vertices:
+        max_saturation_degree = -1
+        for vertex in uncolored_vertices:
+            if (saturation_degrees[vertex] > max_saturation_degree):
+                max_saturation_degree = saturation_degrees[vertex]
+        
+        max_saturation_degrees = [vertex for vertex in uncolored_vertices if saturation_degrees[vertex] == max_saturation_degree]           
+
+        coloring_index = max_saturation_degrees[0]
+        if len(max_saturation_degrees) > 1: 
+            maximum_degree = -1
+            for i in max_saturation_degrees:
+                (degree, vertex_index) = degrees[i]
+                if (degree > maximum_degree):
+                    coloring_index = vertex_index
+                    maximum_degree = degree
+        
+        vertex_index_neighbours = vertex_neighbours(graph, coloring_index)
+        for number_color in range(1, color_counter + 1, 1):
+            if (get_amount_color(colored, vertex_index_neighbours, number_color) == 0):
+                colored[coloring_index] = number_color
+                break
+                
+        if not colored[coloring_index]:
+            color_counter += 1
+            colored[coloring_index] = color_counter
+        
+        uncolored_vertices.remove(coloring_index)
+        
+        for neighbour in vertex_index_neighbours:
+            subneighbours = vertex_neighbours(graph, neighbour)
+            
+            if (get_amount_color(colored, subneighbours, colored[coloring_index]) == 1):
+                saturation_degrees[neighbour] += 1;   
+
+    colors = [[] for i in range(len(graph))]
+    for vertex, i in enumerate(colored):
+    	colors[i].append(vertex)
+
+    return colors
+
+
 
 # TASK 6.1
 
@@ -130,7 +200,7 @@ def task_6_1():
 	colors = greedy(GRAPH_COPY)
 
 	plot_graph(GRAPH, vertices_coordinates)
-	print('Colors:')
+	print('Colors for Greedy Algorithm:')
 	for i, vertices in enumerate(colors):
 		if vertices:
 			print(f"{i}: {' '.join(map(str, vertices))}") 
@@ -141,9 +211,19 @@ def task_6_1():
 # TASK 6.2
 
 def task_6_2():
-	GRAPH = []
+	N = 30
+	angle = 2 * pi / N	
+	GRAPH = generate_graph(N)
+	vertices_coordinates = [[cos(i * angle) * len(GRAPH), sin(i * angle) * len(GRAPH)] for i in range(len(GRAPH))]
+	colors = dsatur(GRAPH)
 
-	dsatur(GRAPH)
+	plot_graph(GRAPH, vertices_coordinates)
+	print('Colors for DSatur Algorithm:')
+	for i, vertices in enumerate(colors):
+		if vertices:
+			print(f"{i}: {' '.join(map(str, vertices))}") 
+	plot_graph(GRAPH, vertices_coordinates, colors = colors)
+
 
 
 if __name__ == '__main__':
