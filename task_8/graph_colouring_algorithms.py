@@ -1,8 +1,8 @@
 '''
-Задание 6.1. 
+Задание 8.1. 
 Окрасить граф G с помощью "жадного" алгоритма.
 
-Задание 6.2. 
+Задание 8.2. 
 Окрасить граф G с помощью алгоритма DSatur.
 '''
 
@@ -189,9 +189,9 @@ def dsatur(graph: list) -> list:
 
 
 
-# TASK 6.1
+# TASK 8.1
 
-def task_6_1():
+def task_8_1():
 	N = 30
 	angle = 2 * pi / N	
 	GRAPH = generate_graph(N)
@@ -208,9 +208,9 @@ def task_6_1():
 	
 
 
-# TASK 6.2
+# TASK 8.2
 
-def task_6_2():
+def task_8_2():
 	N = 30
 	angle = 2 * pi / N	
 	GRAPH = generate_graph(N)
@@ -227,5 +227,5 @@ def task_6_2():
 
 
 if __name__ == '__main__':
-	task_6_1()
-	task_6_2()
+	task_8_1()
+	task_8_2()
